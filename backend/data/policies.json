@@ -1,0 +1,8 @@
+{
+  "resources": {
+    "documents:list":    { "required_permission": "read" },
+    "documents:edit":    { "required_permission": "edit" },
+    "documents:delete":  { "required_permission": "delete" },
+    "admin:users":       { "required_permission": "manage_users" }
+  }
+}

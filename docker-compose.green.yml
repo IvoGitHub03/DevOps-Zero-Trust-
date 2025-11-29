@@ -1,0 +1,16 @@
+version: "3.9"
+
+services:
+  api_green:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: api_green
+    volumes:
+      - ./backend:/app/backend
+    networks:
+      - zeronet
+
+networks:
+  zeronet:
+    external: true

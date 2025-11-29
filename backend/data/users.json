@@ -1,0 +1,20 @@
+[
+  {
+    "username": "viewer1",
+    "password": "1234",
+    "role": "viewer",
+    "mfa_secret": "111111"
+  },
+  {
+    "username": "editor1",
+    "password": "1234",
+    "role": "editor",
+    "mfa_secret": "222222"
+  },
+  {
+    "username": "admin1",
+    "password": "adminpass",
+    "role": "admin",
+    "mfa_secret": "333333"
+  }
+]

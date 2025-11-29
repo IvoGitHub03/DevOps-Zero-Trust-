@@ -1,0 +1,18 @@
+version: "3.9"
+
+services:
+  nginx:
+    image: nginx:latest
+    container_name: proxy
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - api_blue
+    networks:
+      - zeronet
+
+networks:
+  zeronet:
+    driver: bridge
