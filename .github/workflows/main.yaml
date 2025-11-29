@@ -24,21 +24,21 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+        pip install flake8
 
     - name: Lint check
-      run: |
-        pip install flake8
-        flake8 backend/ --ignore=E501
+      run: flake8 backend/ --ignore=E501
 
     - name: Syntax check
+      run: python -m py_compile $(find backend -name "*.py")
+
+    - name: Start service for health test
       run: |
-        python -m py_compile $(git ls-files "*.py")
+        nohup uvicorn backend.main:app --host 0.0.0.0 --port 8000 &
+        sleep 4
 
     - name: Health check
-      run: |
-        nohup uvicorn backend.main:app --reload &
-        sleep 5
-        curl -f http://127.0.0.1:8000/health || exit 1
+      run: curl -f http://127.0.0.1:8000/health
 
 
   deploy-to-server:
@@ -49,7 +49,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Copy files to server via SSH
+    - name: Upload files to server (SCP)
       uses: appleboy/scp-action@v0.1.4
       with:
         host: ${{ secrets.SERVER_HOST }}
@@ -58,7 +58,7 @@ jobs:
         source: "."
         target: "/var/www/zero_trust_app"
 
-    - name: Execute remote deploy script
+    - name: Execute remote deploy script (SSH)
       uses: appleboy/ssh-action@v0.1.6
       with:
         host: ${{ secrets.SERVER_HOST }}
