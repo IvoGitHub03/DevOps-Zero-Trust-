@@ -11,76 +11,76 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
 
-    - name: Setup Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.12"
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-    - name: Syntax check
-      run: python -m py_compile $(git ls-files "*.py")
+      - name: Syntax check
+        run: python -m py_compile $(git ls-files "*.py")
 
-    - name: FastAPI Health Check
-      run: |
-        nohup uvicorn backend.main:app --port 8000 &
-        sleep 3
-        curl -f http://127.0.0.1:8000/health || exit 1
+      - name: FastAPI Health Check
+        run: |
+          nohup uvicorn backend.main:app --port 8000 &
+          sleep 3
+          curl -f http://127.0.0.1:8000/health || exit 1
 
 
   build-green-demo:
-  runs-on: ubuntu-latest
-  steps:
-    - name: Checkout
-      uses: actions/checkout@v3
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
 
-    - name: Build Green Docker Image (demo)
-      run: |
-        echo "Building GREEN version..."
-        docker build -f ./Dockerfile -t green-demo .
-        echo "GREEN build complete."
+      - name: Build Green Docker Image (demo)
+        run: |
+          echo "Building GREEN version..."
+          docker build -f ./Dockerfile -t green-demo .
+          echo "GREEN build complete."
 
 
   promote-green-demo:
     needs: build-green-demo
     runs-on: ubuntu-latest
     steps:
-    - name: Simulate NGINX Switch
-      run: |
-        echo "Simulating switch from BLUE → GREEN"
-        echo "GREEN is now the active version!"
-        echo "(In real deployment, nginx.conf would toggle upstream from api_blue to api_green)"
+      - name: Simulate NGINX Switch
+        run: |
+          echo "Simulating switch from BLUE → GREEN"
+          echo "GREEN is now the active version!"
+          echo "(In a real deployment, nginx.conf would toggle upstream from api_blue to api_green)"
 
 #  deploy-to-server:
- #   needs: build-and-test
- #   runs-on: ubuntu-latest
+#   needs: build-and-test
+#   runs-on: ubuntu-latest
 
- #   steps:
-   # - name: Checkout code
-   #   uses: actions/checkout@v3
+#   steps:
+# - name: Checkout code
+#   uses: actions/checkout@v3
 
-  #  - name: Copy files to server via SSH
-   #   uses: appleboy/scp-action@v0.1.4
-     # with:
-     #   host: ${{ secrets.SERVER_HOST }}
-      # username: ${{ secrets.SERVER_USER }}
-      #  key: ${{ secrets.SERVER_SSH_KEY }}
-    #    source: "."
-      #  target: "/var/www/zero_trust_app"
+#  - name: Copy files to server via SSH
+#   uses: appleboy/scp-action@v0.1.4
+# with:
+#   host: ${{ secrets.SERVER_HOST }}
+# username: ${{ secrets.SERVER_USER }}
+#  key: ${{ secrets.SERVER_SSH_KEY }}
+#    source: "."
+#  target: "/var/www/zero_trust_app"
 
-   # - name: Execute remote deploy script
-    #  uses: appleboy/ssh-action@v0.1.6
-    #  with:
-      #  host: ${{ secrets.SERVER_HOST }}
-      #  username: ${{ secrets.SERVER_USER }}
-       # key: ${{ secrets.SERVER_SSH_KEY }}
-     #   script: |
-      #    cd /var/www/zero_trust_app
-      #    docker compose down || true
-      #    docker compose up -d --build
+# - name: Execute remote deploy script
+#  uses: appleboy/ssh-action@v0.1.6
+#  with:
+#  host: ${{ secrets.SERVER_HOST }}
+#  username: ${{ secrets.SERVER_USER }}
+# key: ${{ secrets.SERVER_SSH_KEY }}
+#   script: |
+#    cd /var/www/zero_trust_app
+#    docker compose down || true
+#    docker compose up -d --build
