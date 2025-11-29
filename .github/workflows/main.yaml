@@ -35,16 +35,15 @@ jobs:
 
 
   build-green-demo:
-    needs: build-and-test
-    runs-on: ubuntu-latest
-    steps:
+  runs-on: ubuntu-latest
+  steps:
     - name: Checkout
       uses: actions/checkout@v3
 
     - name: Build Green Docker Image (demo)
       run: |
         echo "Building GREEN version..."
-        docker build -t zero_trust_green_demo:latest .
+        docker build -f ./Dockerfile -t green-demo .
         echo "GREEN build complete."
 
 
