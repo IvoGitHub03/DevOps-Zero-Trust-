@@ -1,4 +1,4 @@
-name: CI Pipeline - Zero Trust Backend
+name: CI Pipeline - Zero Trust Backend (Blue/Green Demo)
 
 on:
   push:
@@ -10,12 +10,11 @@ jobs:
 
   build-and-test:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
+    - name: Checkout
       uses: actions/checkout@v3
 
-    - name: Set up Python
+    - name: Setup Python
       uses: actions/setup-python@v4
       with:
         python-version: "3.12"
@@ -26,14 +25,38 @@ jobs:
         pip install -r requirements.txt
 
     - name: Syntax check
-      run: |
-        python -m py_compile $(git ls-files "*.py")
+      run: python -m py_compile $(git ls-files "*.py")
 
-    - name: Health check
+    - name: FastAPI Health Check
       run: |
-        nohup uvicorn backend.main:app --reload &
-        sleep 5
+        nohup uvicorn backend.main:app --port 8000 &
+        sleep 3
         curl -f http://127.0.0.1:8000/health || exit 1
+
+
+  build-green-demo:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Build Green Docker Image (demo)
+      run: |
+        echo "Building GREEN version..."
+        docker build -t zero_trust_green_demo:latest .
+        echo "GREEN build complete."
+
+
+  promote-green-demo:
+    needs: build-green-demo
+    runs-on: ubuntu-latest
+    steps:
+    - name: Simulate NGINX Switch
+      run: |
+        echo "Simulating switch from BLUE → GREEN"
+        echo "GREEN is now the active version!"
+        echo "(In real deployment, nginx.conf would toggle upstream from api_blue to api_green)"
 
 #  deploy-to-server:
  #   needs: build-and-test
