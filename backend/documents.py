@@ -7,18 +7,23 @@ from backend.data_utils import read_json, write_json
 router = APIRouter()
 DOCS_PATH = "backend/data/documents.json"
 
+
 def policy_check(user, action):
     role = user["role"]
     needed_perm = required_permission(action)
+
     if not role_has_permission(role, needed_perm):
         raise HTTPException(403, "Access denied")
 
+
 @router.get("/")
+
 def list_docs(user=Depends(verify_jwt)):
     policy_check(user, "documents:list")
     return read_json(DOCS_PATH)
 
-@router.post("/edit")
+
+@router.post("/documents/edit")
 def edit_doc(data: dict, user=Depends(verify_jwt)):
     policy_check(user, "documents:edit")
 
@@ -32,7 +37,8 @@ def edit_doc(data: dict, user=Depends(verify_jwt)):
 
     raise HTTPException(404, "Not found")
 
-@router.post("/delete")
+
+@router.post("/documents/delete")
 def delete_doc(data: dict, user=Depends(verify_jwt)):
     policy_check(user, "documents:delete")
 

@@ -3,10 +3,13 @@ from pydantic import BaseModel
 from backend.data_utils import read_json
 from backend.security import SECRET_KEY, ALGORITHM
 from jose import jwt
+import os
 
 router = APIRouter()
-USERS_PATH = "backend/data/users.json"
 
+# Absolute path to backend/data/users.json
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+USERS_PATH = os.path.join(BASE_DIR, "data", "users.json")
 
 # ---------- Pydantic Models ----------
 class LoginRequest(BaseModel):
@@ -29,7 +32,6 @@ def login(data: LoginRequest):
 
     for u in users:
         if u["username"] == username and u["password"] == password:
-            # Successfully authenticated → now require MFA
             return {
                 "mfa_required": True,
                 "username": username
