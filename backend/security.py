@@ -21,3 +21,17 @@ def verify_jwt(authorization: str | None = Header(None)):
         raise HTTPException(403, "Invalid token")
 
     return data   # { "sub": username, "role": role }
+from fastapi import Depends, HTTPException
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from jose import jwt, JWTError
+from backend.security import SECRET_KEY, ALGORITHM
+
+security = HTTPBearer()
+
+def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    token = credentials.credentials
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return payload
+    except JWTError:
+        raise HTTPException(403, "Invalid or expired token")

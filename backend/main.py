@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException
+from backend.security import verify_token
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import jwt, JWTError

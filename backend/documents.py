@@ -1,3 +1,4 @@
+import os
 from fastapi import APIRouter, Depends, HTTPException
 from backend.security import verify_jwt
 from backend.rbac import role_has_permission
@@ -5,7 +6,9 @@ from backend.policy import required_permission
 from backend.data_utils import read_json, write_json
 
 router = APIRouter()
-DOCS_PATH = "backend/data/documents.json"
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DOCS_PATH = os.path.join(BASE_DIR, "data", "documents.json")
 
 
 def policy_check(user, action):
@@ -16,8 +19,7 @@ def policy_check(user, action):
         raise HTTPException(403, "Access denied")
 
 
-@router.get("/")
-
+@router.get("/documents")
 def list_docs(user=Depends(verify_jwt)):
     policy_check(user, "documents:list")
     return read_json(DOCS_PATH)
